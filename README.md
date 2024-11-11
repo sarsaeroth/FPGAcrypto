@@ -7,6 +7,8 @@ This subdirectory features a collection of Verilog scripts corresponding to vari
 ## Testbench
 This subdirectory features a collection of testbenches which can be used for contextualizing the Verilog scripts, including an example at `example_tb.cpp`. These scripts are interpreted by Verilator at compile time.
 
+## Configs
+This subdirectory features a collection of various gem5 configuration scripts that can be used to simulate a workload on an appropriate FPGA mockup and obtain timing side-channel data
 
 ## Running
 This configuration assumes that you have Verilator installed somewhere on PATH. This can be done with an appropriate package manager, such as `sudo apt install verilator`, though you can also clone the repository and compile from source yourself. Once you have done this, you can compile the Verilog script/C++ testbench using `verilator --cc ./designs/<script>.v --exe ./testbenches/<testbench>.cpp`. It can then be compiled with `make -j -C ./obj\_dir/ -f V<script>.mk V<script>`. The compiled binary can then be run with `./obj\_dir/V<script>` or used as a workload in an appropriate gem5 configuration with `/path/to/gem5/build/.../gem5.opt /path/to/gem5/configs/.../config.py ./obj_dir/V<script>`. Note that gem5 functionality requires having previously built a gem5 config with `scons /path/to/gem5/build/../gem5.opt -j nproc`

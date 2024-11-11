@@ -1,25 +1,21 @@
-// AES 128-bit Encryption Core
 module aes_core (
     input wire clk,
     input wire rst_n,
     input wire start,
-    input wire [127:0] key,    // 128-bit key
-    input wire [127:0] plaintext, // 128-bit input data
-    output reg [127:0] ciphertext, // 128-bit output data
-    output reg ready            // Ready signal
+    input wire [127:0] key,
+    input wire [127:0] plaintext,
+    output reg [127:0] ciphertext,
+    output reg ready
 );
 
-    // Internal signals
-    reg [3:0] round;            // Round counter (10 rounds for AES-128)
-    reg [127:0] state;          // State register (128-bit)
-    reg [127:0] round_key;      // Current round key
-    reg processing;             // Processing flag
+    reg [3:0] round;
+    reg [127:0] state;
+    reg [127:0] round_key;
+    reg processing;
+    wire [127:0] round_key_next;
+    wire [127:0] state_next;
 
-    // AES key schedule, substitution box, and mix columns can be implemented separately
-    wire [127:0] round_key_next; // Next round key (from key schedule)
-    wire [127:0] state_next;     // Next state after round (AES transformations)
-
-    // AES Round Transformation (substitute bytes, shift rows, mix columns, add round key)
+    // AES round transformations (substitute bytes, shift rows, mix columns, add round key)
     aes_round_transform aes_round (
         .state_in(state),
         .round_key_in(round_key),

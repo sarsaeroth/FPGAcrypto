@@ -6,11 +6,10 @@ module rsa_top(
     input [15:0] n,          // Modulus (public key part)
     output reg [15:0] cipher // Output ciphertext
 );
-    reg [15:0] result;
-    reg [15:0] base;
-    reg [15:0] exponent;
-    reg [15:0] modulus;
-
+    reg [31:0] result;
+    reg [31:0] base;
+    reg [31:0] exponent;
+    reg [31:0] modulus;
     reg [31:0] temp;
     reg done;
 

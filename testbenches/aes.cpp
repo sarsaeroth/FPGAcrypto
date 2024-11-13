@@ -8,8 +8,8 @@ int main(int argc, char **argv) {
     Vmodule *aes = new Vmodule;
 
     // Apply inputs to the AES core
-    aes->key = 0x2b7e151628aed2a6abf7158809cf4f3c;  // Example key
-    aes->plaintext = 0x6bc1bee22e409f96e93d7e117393172a;  // Example plaintext
+    aes->key = 0x123456789ABCDEF11121314151617181;
+    aes->plaintext = 0x31415926535897932384626433832795;
     aes->start = 1;
 
     // Run simulation

@@ -1,96 +1,57 @@
-module aes_core (
+// Wrapper containing global and state variables
+module aes (
+    // Global variables
     input wire clk,
     input wire rst_n,
     input wire start,
-    input wire [127:0] key,
-    input wire [127:0] plaintext,
-    output reg [127:0] ciphertext,
-    output reg ready
-);
+    input wire [127:0] key, // 32-byte key input from testbench file
+    input wire [127:0] plaintext, // 32-byte plaintext input from testbench file
+    output reg [127:0] ciphertext, // 32-byte ciphertext written to testbench file
 
+    // State variables
     reg [3:0] round;
     reg [127:0] state;
     reg [127:0] round_key;
-    reg processing;
     wire [127:0] round_key_next;
     wire [127:0] state_next;
 
-    // AES round transformations (substitute bytes, shift rows, mix columns, add round key)
-    aes_round_transform aes_round (
-        .state_in(state),
-        .round_key_in(round_key),
-        .state_out(state_next)
-    );
+    initial begin
+        ciphertext <= 128'b0;
+	round <= 4'b0;
+	state <= plaintext;
+	round_key <= key;
 
-    // AES Key Expansion (simplified, modify for full key expansion logic)
-    aes_key_schedule key_expansion (
-        .key(key),
-        .round(round),
-        .round_key(round_key_next)
-    );
+	state <= add_round_key(state, round_key);
 
-    // Process AES encryption rounds
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            state <= 128'b0;
-            round <= 4'b0;
-            ciphertext <= 128'b0;
-            ready <= 1'b1;
-            processing <= 1'b0;
+        while (round < 4'b1010)
+            begin
+		round_key_next <= key_expansion(round, round_key);
+		round_key <= round_key_next;
+
+		state <= sub_bytes(state);
+		state <= shift_rows(state);
+		state <= mix_columns(state);
+		state <= mix_columns(state, round_key);
+
+		round <= round + 1;
+	    end
         end
-        else if (start && !processing) begin
-            // Start AES encryption
-            state <= plaintext;
-            round_key <= key;    // Initial round key is the cipher key
-            round <= 4'b0;
-            processing <= 1'b1;
-            ready <= 1'b0;
-        end
-        else if (processing) begin
-            if (round < 4'd10) begin
-                // Perform AES round
-                state <= state_next;
-                round_key <= round_key_next;
-                round <= round + 1;
-            end
-            else begin
-                // Final round complete, output ciphertext
-                ciphertext <= state;
-                ready <= 1'b1;
-                processing <= 1'b0;
-            end
-        end
+
+	ciphertext <= state;
     end
-endmodule
-
-// AES Round Transformation (example with substitute bytes and add round key)
-module aes_round_transform (
-    input wire [127:0] state_in,
-    input wire [127:0] round_key_in,
-    output wire [127:0] state_out
 );
 
-    // Substitute bytes, shift rows, mix columns, and add round key
-    assign state_out = substitute_bytes(state_in) ^ round_key_in;
-
-    // Substitute bytes function (simplified for clarity)
-    function [127:0] substitute_bytes(input [127:0] state_in);
-        // Substitute bytes logic (use a pre-defined S-box for AES)
-        // ... (Simplify for example)
-        substitute_bytes = state_in;  // Replace with actual S-box substitution
-    endfunction
-
-endmodule
-
-// AES Key Schedule (simplified example)
-module aes_key_schedule (
-    input wire [127:0] key,
-    input wire [3:0] round,
-    output wire [127:0] round_key
+module key_expansion (
 );
 
-    // Simplified key expansion logic (replace with full key schedule)
-    assign round_key = key ^ round;  // Replace with actual key expansion logic
+module sub_bytes (
+);
 
-endmodule
+module shift_rows (
+);
 
+module mix_columns(
+);
+
+module add_round_key(
+);

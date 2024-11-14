@@ -52,6 +52,8 @@ module sub_bytes (
     reg [127:0] sub_state;
     sub_state = 128'b0;
 
+    genvar i;
+    generate
     for (i=0; i<8; i=i+1) begin
 	    // Lookup table implementation
 	    case (old_state[127-8*i:111-8*i]) begin
@@ -83,8 +85,30 @@ module shift_rows (
 );
     reg [127:0] shift_state;
     shift_state = 128'b0;
+    
+    // First row is not shifted
+    shift_state[127:120] <= old_state[127:120];
+    shift_state[119:112] <= old_state[119:112];
+    shift_state[111:104] <= old_state[111:104];
+    shift_state[103:96] <= old_state[103:96];
 
+    // Second row is shifted by 1
+    shift_state[95:88] <= old_state[87:80];
+    shift_state[87:80] <= old_state[79:72];
+    shift_state[79:72] <= old_state[71:64];
+    shift_state[71:64] <= old_state[95:88];
 
+    // Third row is shifted by 2
+    shift_state[63:56] <= old_state[47:40];
+    shift_state[55:48] <= old_state[39:32];
+    shift_state[47:40] <= old_State[63:56];
+    shift_state[39:32] <= old_state[55:48];
+
+    // Fourth row is shifted by 3
+    shift_state[31:24] <= old_state[7:0];
+    shift_state[23:16] <= old_state[31:24];
+    shift_state[15:8] <= old_state[23:16];
+    shift_State[7:0] <= old_state[15:8];
 
     assign new_state = shift_state;
 endmodule
@@ -93,8 +117,51 @@ module mix_columns(
     input old_state,
     output reg [127:0] new_state,
 );
+    function [7:0] gmul2
+        input [7:0] bytes;
+	begin
+	    // Multiply by 2 by bit-shifting
+	    if(x[7] == 1)
+	        gmul2 = ((bytes << 1) ^ 8h'1b); // XOR in case bit shift loses MSB
+	    else
+	        gmul2 = bytes << 1;
+	end
+    endfunction
+
+    function [7:0] gmul3
+        input bytes;
+	begin
+	    //gmul3 = gmul2 + XOR in GF(2^8)
+	    gmul3 = gmul2(bytes) ^ bytes;
+        end
+    endfunction
+
     reg [127:0] mix_state;
     mix_state = 128'b0;
+
+    // First column
+    mix_state[127:120] = gmul2(old_state[127:120]) ^ gmul3(old_state[95:88]) ^ old_state[63:56] ^ old_state[31:24];
+    mix_state[95:88] = old_state[127:120] ^ gmul2(old_state[95:88]) ^ gmul3(old_state[63:56]) ^ old_state[31:24];
+    mix_state[63:56] = old_state[127:120] ^ old_state[95:88] ^ gmul2(old_state[63:56]) ^ gmul3(old_state[31:24]);
+    mix_state[31:24] = gmul3(old_state[127:120]) ^ old_state[95:88] ^ old_state[63:56] ^ gmul2(old_state[31:24]);
+    
+    // Second column
+    mix_state[119:112] = gmul2(old_state[119:112]) ^ gmul3(old_state[87:80]) ^ old_state[55:48] ^ old_state[23:16];
+    mix_state[87:80] = old_state[119:112] ^ gmul2(old_state[87:80]) ^ gmul3(old_state[55:48]) ^ old_state[23:16];
+    mix_state[55:48] = old_state[119:112] ^ old_state[87:80] ^ gmul2(old_state[55:48]) ^ gmul3(old_state[23:16]);
+    mix_state[23:16] = gmul3(old_state[119:112]) ^ old_state[87:80] ^ old_state[53:48] ^ gmul2(old_state[23:16]);
+
+    // Third column
+    mix_state[111:104] = gmul2(old_state[111:104]) ^ gmul3(old_state[79:72]) ^ old_state[47:40] ^ old_state[15:8];
+    mix_state[79:72] = old_state[111:104] ^ gmul2(old_state[79:72]) ^ gmul3(old_state[47:40]) ^ old_state[15:8];
+    mix_state[47:40] = old_state[111:104] ^ old_state[79:72] ^ gmul2(old_state[47:40]) ^ gmul3(old_state[15:8]);
+    mix_state[15:8] = gmul3(old_state[111:104]) ^ old_state[79:72] ^ old_state[47:40] ^ gmul2(old_state[15:8]);
+    
+    // Fourth column
+    mix_state[103:96] = gmul2(old_state[103:96]) ^ gmul3(old_state[103:96]) ^ old_state[39:32] ^ old_state[7:0];
+    mix_state[71:64] = old_state[103:96] ^ gmul2(old_state[71:64]) ^ gmul3(old_state[39:32]) ^ old_state[7:0];
+    mix_state[39:32] = old_state[103:96] ^ old_state[71:64] ^ gmul2(old_state[39:32]) ^ gmul3(old_state[7:0]);
+    mix_state[7:0] = gmul3(old_state[103:96]) ^ old_state[71:64] ^ old_state[39:32] ^ gmul2(old_state[7:0]);
 
     assign new_state = mix_state;
 endmodule

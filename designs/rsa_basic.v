@@ -1,10 +1,10 @@
 module rsa_top(
     input clk,
     input reset,
-    input [15:0] message,    // Input message (plaintext)
-    input [15:0] e,          // Public exponent
-    input [15:0] n,          // Modulus (public key part)
-    output reg [15:0] cipher // Output ciphertext
+    input [31:0] message,    // Input message (plaintext)
+    input [31:0] e,          // Public exponent
+    input [31:0] n,          // Modulus (public key part)
+    output reg [31:0] cipher // Output ciphertext
 );
     reg [31:0] result;
     reg [31:0] base;
@@ -22,7 +22,7 @@ module rsa_top(
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             state <= IDLE;
-            result <= 16'd1;
+            result <= 32'd1;
             base <= 0;
             exponent <= 0;
             modulus <= 0;
@@ -31,7 +31,7 @@ module rsa_top(
         end else begin
             case (state)
                 IDLE: begin
-                    result <= 16'd1;
+                    result <= 32'd1;
                     base <= message % n;
                     exponent <= e;
                     modulus <= n;

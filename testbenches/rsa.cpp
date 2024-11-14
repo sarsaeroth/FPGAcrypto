@@ -1,40 +1,39 @@
-module tb_rsa_top;
-    reg clk;
-    reg reset;
-    reg [15:0] message;
-    reg [15:0] e;
-    reg [15:0] n;
-    wire [15:0] cipher;
+#include "Vrsa_basic.h"  // Verilator generated header for the rsa core
+#include "verilated.h"
 
-    rsa_top uut (
-        .clk(clk),
-        .reset(reset),
-        .message(message),
-        .e(e),
-        .n(n),
-        .cipher(cipher)
-    );
+int main(int argc, char **argv) {
+    Verilated::commandArgs(argc, argv);
 
-    // Clock generation
-    initial begin
-        clk = 0;
-        forever #5 clk = ~clk;
-    end
+    // Instantiate rsa core
+    Vrsa_basic *rsa = new Vrsa_basic;
 
-    // Test sequence
-    initial begin
-        reset = 1;
-        #10 reset = 0;
+    // Apply inputs to the rsa core
+    rsa->n = 0x2b7e1516;  // Example key
+    rsa->message = 0x6b;  // Example plaintext
+    rsa->e = 65537;
+    rsa->clk = 0;
 
-        // Test case: message = 7, e = 5, n = 21
-        message = 16'd7;
-        e = 16'd5;
-        n = 16'd21;
+    int cycles = 0;
+    int max_cycles = 1000;  // Set a maximum cycle count to avoid infinite loops
 
-        #100;
-        $display("Ciphertext: %d", cipher);
+    while (!Verilated::gotFinish() && cycles < max_cycles) {
+        rsa->clk = !rsa->clk;  // Toggle clock
+        rsa->eval();           // Evaluate the core
 
-        $stop;
-    end
-endmodule
+        // Check if output is ready
+        if (rsa->cipher != 0) {
+            printf("Ciphertext: %x\n", rsa->cipher);
+            break;
+        }
+
+        cycles++;
+    }
+
+    if (cycles >= max_cycles) {
+        printf("Reached max cycles without completing.\n");
+    }
+
+    delete rsa;
+    return 0;
+}
 

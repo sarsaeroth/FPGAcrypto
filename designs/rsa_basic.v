@@ -13,7 +13,7 @@ module rsa_top(
     reg [31:0] temp;
     reg done;
 
-    // State machine states
+ // State machine states
     parameter IDLE = 0;
     parameter COMPUTE = 1;
     parameter DONE = 2;
@@ -42,12 +42,10 @@ module rsa_top(
                 COMPUTE: begin
                     if (exponent > 0) begin
                         if (exponent[0] == 1) begin
-                            temp = result * base;
-                            result <= temp % modulus;
+                            result <= (result * base) % modulus;
                         end
                         exponent <= exponent >> 1;
-                        temp = base * base;
-                        base <= temp % modulus;
+                        base <= (base * base) % modulus;
                     end else begin
                         state <= DONE;
                     end

@@ -1,28 +1,25 @@
 module rsa_top(
     input clk,
     input reset,
-    input [31:0] message,    // Input message (plaintext)
-    input [31:0] e,          // Public exponent
-    input [31:0] n,          // Modulus (public key part)
-    output reg [31:0] cipher // Output ciphertext
+    input [31:0] message,    // message plaintext
+    input [31:0] e,          // exponent
+    input [31:0] n,          // modulus
+    output reg [31:0] cipher, 
+    output reg done
 );
-    reg [31:0] result;
-    reg [31:0] base;
-    reg [31:0] exponent;
-    reg [31:0] modulus;
-    reg [31:0] temp;
-    reg done;
 
- // State machine states
-    parameter IDLE = 0;
-    parameter COMPUTE = 1;
-    parameter DONE = 2;
+    reg [63:0] result;      
+    reg [63:0] base;
+    reg [63:0] modulus;     
+    reg [31:0] exponent;
+
+    parameter IDLE = 0, COMPUTE = 1, DONE = 2;
     reg [1:0] state;
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             state <= IDLE;
-            result <= 32'd1;
+            result <= 64'd1;
             base <= 0;
             exponent <= 0;
             modulus <= 0;
@@ -31,10 +28,10 @@ module rsa_top(
         end else begin
             case (state)
                 IDLE: begin
-                    result <= 32'd1;
-                    base <= message % n;
+                    result <= 64'd1;
+                    base <= {32'b0, message} % {32'b0, n};
                     exponent <= e;
-                    modulus <= n;
+                    modulus <= {32'b0, n};              
                     state <= COMPUTE;
                     done <= 0;
                 end
@@ -52,9 +49,12 @@ module rsa_top(
                 end
 
                 DONE: begin
-                    cipher <= result;
-                    done <= 1;
-                    state <= IDLE;
+                    if (!done) begin
+                        cipher <= result[31:0];
+                        done <= 1;
+                    end else begin
+                        state <= IDLE;
+                    end
                 end
 
                 default: state <= IDLE;

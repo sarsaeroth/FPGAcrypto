@@ -1,10 +1,9 @@
-#include "Vrsa_basic.h"  // Verilator generated header for the rsa core
+#include "Vrsa_basic.h" 
 #include "verilated.h"
 
 int main(int argc, char **argv) {
     Verilated::commandArgs(argc, argv);
 
-    // Instantiate rsa core
     Vrsa_basic *rsa = new Vrsa_basic;
 
     rsa->n = 0x2b7e1516;  // Example key
@@ -12,23 +11,22 @@ int main(int argc, char **argv) {
     rsa->e = 2;
     rsa->clk = 0;
 
+    printf("n: %x, message: %x, e: %x\n", rsa->n, rsa->message, rsa->e);
+
     int cycles = 0;
-    int max_cycles = 1000;  //set number of cycles 
+    int max_cycles = 100000000000;
 
     while (!Verilated::gotFinish() && cycles < max_cycles) {
-        rsa->clk = !rsa->clk;  // toggle clk
+        rsa->clk = !rsa->clk;
         rsa->eval();     
 
-        if (rsa->cipher != 0) {
+        if (rsa->done) { 
             printf("Ciphertext: %x\n", rsa->cipher);
-            break;
+        break;
         }
 
         cycles++;
-    }
-
-    if (cycles >= max_cycles) {
-        printf("Did not complete encryption.\n");
+        
     }
 
     delete rsa;

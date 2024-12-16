@@ -18,15 +18,18 @@ VL_INLINE_OPT void Vrsa_basic___024root___nba_sequent__TOP__0(Vrsa_basic___024ro
     // Init
     CData/*1:0*/ __Vdly__rsa_top__DOT__state;
     __Vdly__rsa_top__DOT__state = 0;
-    IData/*31:0*/ __Vdly__rsa_top__DOT__result;
+    QData/*63:0*/ __Vdly__rsa_top__DOT__result;
     __Vdly__rsa_top__DOT__result = 0;
-    IData/*31:0*/ __Vdly__rsa_top__DOT__base;
+    QData/*63:0*/ __Vdly__rsa_top__DOT__base;
     __Vdly__rsa_top__DOT__base = 0;
     IData/*31:0*/ __Vdly__rsa_top__DOT__exponent;
     __Vdly__rsa_top__DOT__exponent = 0;
-    IData/*31:0*/ __Vdly__rsa_top__DOT__modulus;
+    QData/*63:0*/ __Vdly__rsa_top__DOT__modulus;
     __Vdly__rsa_top__DOT__modulus = 0;
+    CData/*0:0*/ __Vdly__done;
+    __Vdly__done = 0;
     // Body
+    __Vdly__done = vlSelf->done;
     __Vdly__rsa_top__DOT__modulus = vlSelf->rsa_top__DOT__modulus;
     __Vdly__rsa_top__DOT__exponent = vlSelf->rsa_top__DOT__exponent;
     __Vdly__rsa_top__DOT__base = vlSelf->rsa_top__DOT__base;
@@ -34,34 +37,40 @@ VL_INLINE_OPT void Vrsa_basic___024root___nba_sequent__TOP__0(Vrsa_basic___024ro
     __Vdly__rsa_top__DOT__state = vlSelf->rsa_top__DOT__state;
     if (vlSelf->reset) {
         __Vdly__rsa_top__DOT__state = 0U;
-        __Vdly__rsa_top__DOT__result = 1U;
-        __Vdly__rsa_top__DOT__base = 0U;
+        __Vdly__rsa_top__DOT__result = 1ULL;
+        __Vdly__rsa_top__DOT__base = 0ULL;
         __Vdly__rsa_top__DOT__exponent = 0U;
-        __Vdly__rsa_top__DOT__modulus = 0U;
+        __Vdly__rsa_top__DOT__modulus = 0ULL;
+        __Vdly__done = 0U;
         vlSelf->cipher = 0U;
     } else if ((0U == (IData)(vlSelf->rsa_top__DOT__state))) {
-        __Vdly__rsa_top__DOT__result = 1U;
-        __Vdly__rsa_top__DOT__base = VL_MODDIV_III(32, vlSelf->message, vlSelf->n);
+        __Vdly__rsa_top__DOT__result = 1ULL;
+        __Vdly__rsa_top__DOT__base = VL_MODDIV_QQQ(64, (QData)((IData)(vlSelf->message)), (QData)((IData)(vlSelf->n)));
         __Vdly__rsa_top__DOT__exponent = vlSelf->e;
-        __Vdly__rsa_top__DOT__modulus = vlSelf->n;
+        __Vdly__rsa_top__DOT__modulus = (QData)((IData)(vlSelf->n));
         __Vdly__rsa_top__DOT__state = 1U;
+        __Vdly__done = 0U;
     } else if ((1U == (IData)(vlSelf->rsa_top__DOT__state))) {
         if ((0U < vlSelf->rsa_top__DOT__exponent)) {
             if ((1U & vlSelf->rsa_top__DOT__exponent)) {
-                __Vdly__rsa_top__DOT__result = VL_MODDIV_III(32, 
+                __Vdly__rsa_top__DOT__result = VL_MODDIV_QQQ(64, 
                                                              (vlSelf->rsa_top__DOT__result 
                                                               * vlSelf->rsa_top__DOT__base), vlSelf->rsa_top__DOT__modulus);
             }
             __Vdly__rsa_top__DOT__exponent = VL_SHIFTR_III(32,32,32, vlSelf->rsa_top__DOT__exponent, 1U);
-            __Vdly__rsa_top__DOT__base = VL_MODDIV_III(32, 
+            __Vdly__rsa_top__DOT__base = VL_MODDIV_QQQ(64, 
                                                        (vlSelf->rsa_top__DOT__base 
                                                         * vlSelf->rsa_top__DOT__base), vlSelf->rsa_top__DOT__modulus);
         } else {
             __Vdly__rsa_top__DOT__state = 2U;
         }
     } else if ((2U == (IData)(vlSelf->rsa_top__DOT__state))) {
-        vlSelf->cipher = vlSelf->rsa_top__DOT__result;
-        __Vdly__rsa_top__DOT__state = 0U;
+        if (vlSelf->done) {
+            __Vdly__rsa_top__DOT__state = 0U;
+        } else {
+            vlSelf->cipher = (IData)(vlSelf->rsa_top__DOT__result);
+            __Vdly__done = 1U;
+        }
     } else {
         __Vdly__rsa_top__DOT__state = 0U;
     }
@@ -70,6 +79,7 @@ VL_INLINE_OPT void Vrsa_basic___024root___nba_sequent__TOP__0(Vrsa_basic___024ro
     vlSelf->rsa_top__DOT__base = __Vdly__rsa_top__DOT__base;
     vlSelf->rsa_top__DOT__exponent = __Vdly__rsa_top__DOT__exponent;
     vlSelf->rsa_top__DOT__modulus = __Vdly__rsa_top__DOT__modulus;
+    vlSelf->done = __Vdly__done;
 }
 
 void Vrsa_basic___024root___eval_nba(Vrsa_basic___024root* vlSelf) {

@@ -11,6 +11,7 @@ Vrsa_basic::Vrsa_basic(VerilatedContext* _vcontextp__, const char* _vcname__)
     , vlSymsp{new Vrsa_basic__Syms(contextp(), _vcname__, this)}
     , clk{vlSymsp->TOP.clk}
     , reset{vlSymsp->TOP.reset}
+    , done{vlSymsp->TOP.done}
     , message{vlSymsp->TOP.message}
     , e{vlSymsp->TOP.e}
     , n{vlSymsp->TOP.n}

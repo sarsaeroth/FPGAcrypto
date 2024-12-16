@@ -73,10 +73,11 @@ VL_ATTR_COLD void Vrsa_basic___024root___ctor_var_reset(Vrsa_basic___024root* vl
     vlSelf->e = VL_RAND_RESET_I(32);
     vlSelf->n = VL_RAND_RESET_I(32);
     vlSelf->cipher = VL_RAND_RESET_I(32);
-    vlSelf->rsa_top__DOT__result = VL_RAND_RESET_I(32);
-    vlSelf->rsa_top__DOT__base = VL_RAND_RESET_I(32);
+    vlSelf->done = VL_RAND_RESET_I(1);
+    vlSelf->rsa_top__DOT__result = VL_RAND_RESET_Q(64);
+    vlSelf->rsa_top__DOT__base = VL_RAND_RESET_Q(64);
+    vlSelf->rsa_top__DOT__modulus = VL_RAND_RESET_Q(64);
     vlSelf->rsa_top__DOT__exponent = VL_RAND_RESET_I(32);
-    vlSelf->rsa_top__DOT__modulus = VL_RAND_RESET_I(32);
     vlSelf->rsa_top__DOT__state = VL_RAND_RESET_I(2);
     vlSelf->__Vtrigprevexpr___TOP__clk__0 = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigprevexpr___TOP__reset__0 = VL_RAND_RESET_I(1);

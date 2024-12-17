@@ -29,7 +29,7 @@ module rsa_top(
             case (state)
                 IDLE: begin
                     result <= 64'd1;
-                    base <= {32'b0, message} % {32'b0, n};
+                    base <= ({32'b0, message} * 85738) % {32'b0, n};
                     exponent <= e;
                     modulus <= {32'b0, n};              
                     state <= COMPUTE;

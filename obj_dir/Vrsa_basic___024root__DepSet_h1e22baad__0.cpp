@@ -45,7 +45,9 @@ VL_INLINE_OPT void Vrsa_basic___024root___nba_sequent__TOP__0(Vrsa_basic___024ro
         vlSelf->cipher = 0U;
     } else if ((0U == (IData)(vlSelf->rsa_top__DOT__state))) {
         __Vdly__rsa_top__DOT__result = 1ULL;
-        __Vdly__rsa_top__DOT__base = VL_MODDIV_QQQ(64, (QData)((IData)(vlSelf->message)), (QData)((IData)(vlSelf->n)));
+        __Vdly__rsa_top__DOT__base = VL_MODDIV_QQQ(64, 
+                                                   (0x14eeaULL 
+                                                    * (QData)((IData)(vlSelf->message))), (QData)((IData)(vlSelf->n)));
         __Vdly__rsa_top__DOT__exponent = vlSelf->e;
         __Vdly__rsa_top__DOT__modulus = (QData)((IData)(vlSelf->n));
         __Vdly__rsa_top__DOT__state = 1U;

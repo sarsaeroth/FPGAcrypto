@@ -4,6 +4,7 @@ module aes (
     input wire start,
     input wire [127:0] key,
     input wire [127:0] plaintext,
+    input wire [127:0] mask,
     output reg [127:0] ciphertext,
     output reg ready
 );
@@ -32,6 +33,7 @@ module aes (
 	.rst_n(rst_n),
 	.start(processing),
 	.key(key),
+	.mask(mask),
 	.round_keys(round_keys)
     );
 
@@ -65,6 +67,7 @@ module aes (
         .start(processing),
         .old_state(state_stage3),
         .round_key(round_key),
+	.mask(mask),
         .new_state(add_round_key_out)
     );
 
@@ -120,6 +123,7 @@ module key_expansion (
     input wire rst_n,
     input wire start,
     input wire [127:0] key, // 32-byte key input
+    input wire [127:0] mask, // Added on to round keys and subtracted back off at the end of the round
     output reg [127:0] round_keys [10:0] // 11 32-byte round keys
 );
     // Internal variables
@@ -189,6 +193,8 @@ module key_expansion (
             round_keys[i][95:64] = round_keys[i - 1][95:64] ^ round_keys[i][127:96];
             round_keys[i][63:32] = round_keys[i - 1][63:32] ^ round_keys[i][95:64];
             round_keys[i][31:0] = round_keys[i - 1][31:0] ^ round_keys[i][63:32];
+
+	    round_keys[i] = round_keys[i] ^ mask;
         end
     end
 end
@@ -350,11 +356,12 @@ module add_round_key (
     input wire start,
     input wire [127:0] old_state, // 128-bit input state
     input wire [127:0] round_key, // 128-bit round key
+    input wire [127:0] mask, // Cancels with masked round keys
     output reg [127:0] new_state // 128-bit output state after XOR
 );
 
     // XOR the input state with the round key
-    assign new_state = old_state ^ round_key;
+    assign new_state = old_state ^ round_key ^ mask;
 
 endmodule
 

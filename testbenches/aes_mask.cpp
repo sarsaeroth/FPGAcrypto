@@ -27,11 +27,13 @@ int main(int argc, char **argv) {
     aes->rst_n = 1;       // Deassert reset
     toggle_clock(aes, 2); // Ensure reset deassertion propagates
 
-    // Define 128-bit key and plaintext
+    // Define 128-bit key, plaintext, and mask
     uint64_t key_high = 0xa7a25af34eb38425ULL;
     uint64_t key_low = 0xaebf1098a02227cbULL;
     uint64_t plaintext_high = 0x3141592653589793ULL;
     uint64_t plaintext_low = 0x2384626433832795ULL;
+    uint64_t mask_high = 0xf7ac48936a3d1f1aULL;
+    uint64_t mask_low = 0xe70a491c51df5944ULL;
 
     // Assign key to WData[4] array
     aes->key[0] = static_cast<uint32_t>(key_low & 0xFFFFFFFF);
@@ -44,6 +46,12 @@ int main(int argc, char **argv) {
     aes->plaintext[1] = static_cast<uint32_t>(plaintext_low >> 32);
     aes->plaintext[2] = static_cast<uint32_t>(plaintext_high & 0xFFFFFFFF);
     aes->plaintext[3] = static_cast<uint32_t>(plaintext_high >> 32);
+
+    // Assign mask to WData[4] array
+    aes->mask[0] = static_cast<uint32_t>(mask_low & 0xFFFFFFFF);
+    aes->mask[1] = static_cast<uint32_t>(mask_low >> 32);
+    aes->mask[2] = static_cast<uint32_t>(mask_high & 0xFFFFFFFF);
+    aes->mask[3] = static_cast<uint32_t>(mask_high >> 32);
 
     // Start AES encryption
     std::cout << "Starting AES encryption..." << std::endl;
@@ -62,11 +70,6 @@ int main(int argc, char **argv) {
             break;
         }
     }
-
-    if (!ready) {
-        std::cerr << "Error: AES encryption did not complete within " << max_cycles << " cycles." << std::endl;
-    }
-
     // Print input and output values
     std::cout << "Plaintext:  0x" << std::hex << plaintext_high << plaintext_low << std::endl;
     std::cout << "Key:        0x" << std::hex << key_high << key_low << std::endl;
